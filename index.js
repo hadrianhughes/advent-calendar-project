@@ -19,12 +19,15 @@ const generateCoord = () => randomBetween(ORIGIN + CANVAS_SIZE / 2, MAX_DISTANCE
 const generatePoint = () => ({ x: generateCoord(), y: generateCoord() });
 
 
-const points = [];
+let points = [];
 
 function init () {
-  points.push({ x: -(CANVAS_SIZE / 2), y: randomBetween(-(CANVAS_SIZE / 2), CANVAS_SIZE / 2) });
-  points.push({ x: CANVAS_SIZE / 2, y: randomBetween(ORIGIN, MAX_DISTANCE) });
-  points.push(generatePoint());
+  // Generate points
+  points = [
+    { x: -(CANVAS_SIZE / 2), y: randomBetween(-(CANVAS_SIZE / 2), CANVAS_SIZE / 2) },
+    { x: CANVAS_SIZE / 2, y: randomBetween(ORIGIN, MAX_DISTANCE) },
+    generatePoint()
+  ];
 
   loop();
 }
@@ -37,6 +40,14 @@ function loop () {
 }
 
 function update () {
+  const p = points[0];
+  const pp = points[1];
+  const mid = { x: (p.x + pp.x) / 2, y: (p.y + pp.y) / 2 };
+  const cp1 = { x: (mid.x + p.x) / 2, y: p.y };
+  const cp2 = { x: (mid.x + pp.x) / 2, y: pp.y };
+  const sledOnLine = getCubicBezierXYatPercent(p, pp, cp1, cp2, 0.5);
+
+  points = points.map(point => ({ x: point.x - sledOnLine.x, y: point.y - sledOnLine.y }));
 }
 
 function render () {
@@ -73,3 +84,19 @@ function render () {
 }
 
 init();
+
+function getCubicBezierXYatPercent (start, end, cp1, cp2, percent) {
+  const x = CubicN(percent, start.x, cp1.x, cp2.x, end.x);
+  const y = CubicN(percent, start.y, cp1.y, cp2.y, end.y);
+  return { x, y };
+}
+
+// cubic helper formula at percent distance
+function CubicN (pct, a, b, c, d) {
+  const t2 = pct * pct;
+  const t3 = t2 * pct;
+  return a + (-a * 3 + pct * (3 * a - a * pct)) * pct
+  + (3 * b + pct * (-6 * b + b * 3 * pct)) * pct
+  + (c * 3 - c * 3 * pct) * t2
+  + d * t3;
+}
