@@ -52,13 +52,24 @@ function render () {
   ctx.closePath();
   ctx.fillStyle = 'black';
 
-  points.forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x + xOffset, p.y + yOffset, 5, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.closePath();
-  });
+  ctx.moveTo(points[0].x + xOffset, points[0].y + yOffset);
+  for (let i = 0;i < points.length - 1;i += 1) {
+    const p = points[i];
+    const pp = points[i + 1];
+    const mid = { x: (p.x + pp.x) / 2, y: (p.y + pp.y) / 2 };
+    const cp1 = { x: (mid.x + p.x) / 2, y: p.y };
+    const cp2 = { x: (mid.x + pp.x) / 2, y: pp.y };
+
+    ctx.bezierCurveTo(
+      cp1.x + xOffset,
+      cp1.y + yOffset,
+      cp2.x + xOffset,
+      cp2.y + yOffset,
+      pp.x + xOffset,
+      pp.y + yOffset
+    );
+  }
+  ctx.stroke();
 }
 
 init();
-console.log(points);
