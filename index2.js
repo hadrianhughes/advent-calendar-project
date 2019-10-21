@@ -2,12 +2,15 @@ const canvas = document.getElementById('root');
 const ctx = canvas.getContext('2d');
 
 const CANVAS_SIZE = 200;
-const POINT_X = CANVAS_SIZE + 50;
+const POINT_X = CANVAS_SIZE + 200;
+const ACTIVE_INDEX = 1;
+const SPEED = 0.1;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
 
 let points = [];
+let percentCounter = 0.5;
 
 const random = (max, min = 0) => Math.floor(Math.random() * (max - min)) + min;
 
@@ -32,29 +35,41 @@ function getCubicBezierXYatPercent (start, end, cp1, cp2, percent) {
 }
 
 function init () {
-  points = [ generatePoint(-50), generatePoint() ];
+  points = [
+    generatePoint(-CANVAS_SIZE),
+    generatePoint(0),
+    generatePoint(CANVAS_SIZE),
+    generatePoint()
+  ];
 
   loop();
 }
 
 function loop () {
-  requestAnimationFrame(loop);
+  // requestAnimationFrame(loop);
 
   update();
   render();
 }
 
 function update () {
-  const p = points[0];
-  const pp = points[1];
+  if (percentCounter > 1) {
+    points = [ ...points.slice(1), generatePoint() ];
+    percentCounter = SPEED;
+  }
+
+  const p = points[ACTIVE_INDEX];
+  const pp = points[ACTIVE_INDEX + 1];
   const mid = { x: (p.x + pp.x) / 2, y: (p.y + pp.y) / 2 };
   const cp1 = { x: (mid.x + p.x) / 2, y: p.y };
   const cp2 = { x: (mid.x + pp.x) / 2, y: pp.y };
-  const sledOnLine = getCubicBezierXYatPercent(p, pp, cp1, cp2, 0.5);
+  const sledOnLine = getCubicBezierXYatPercent(p, pp, cp1, cp2, percentCounter);
   const differenceY = (CANVAS_SIZE / 2) - sledOnLine.y;
   const differenceX = (CANVAS_SIZE / 2) - sledOnLine.x;
 
   points = points.map(point => ({ x: point.x + differenceX, y: point.y + differenceY }));
+
+  percentCounter += SPEED;
 }
 
 function render () {
@@ -83,3 +98,5 @@ function render () {
 }
 
 init();
+
+window.addEventListener('keyup', loop);
