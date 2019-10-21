@@ -33,7 +33,6 @@ function getCubicBezierXYatPercent (start, end, cp1, cp2, percent) {
 
 function init () {
   points = [ generatePoint(-50), generatePoint() ];
-  console.log(points);
 
   loop();
 }
