@@ -93,8 +93,11 @@ function render () {
     const cp2 = { x: (mid.x + pp.x) / 2, y: pp.y };
 
     ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pp.x, pp.y);
-    ctx.stroke();
   }
+  ctx.lineTo(points[points.length - 1].x + 50, 300);
+  ctx.lineTo(points[0].x, 300);
+  ctx.fillStyle = '#EBE8DF';
+  ctx.fill();
 
   ctx.closePath();
 
