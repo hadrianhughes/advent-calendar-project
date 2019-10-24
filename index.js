@@ -7,6 +7,8 @@ const ACTIVE_INDEX = 1;
 const MAX_Y_OFFSET = 10;
 const SPEED = 0.03;
 
+const sledImg = document.getElementById('sled');
+
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
 
@@ -117,9 +119,7 @@ function render () {
   ctx.translate(CANVAS_SIZE / 2, CANVAS_SIZE / 2);
   ctx.rotate(angle);
   ctx.translate(-CANVAS_SIZE / 2, -CANVAS_SIZE / 2);
-  ctx.beginPath();
-  ctx.fillStyle = 'red';
-  ctx.fillRect(CANVAS_SIZE / 2 - 5, CANVAS_SIZE / 2 - 10, 10, 10);
+  ctx.drawImage(sledImg, CANVAS_SIZE / 2 - sledImg.width / 2, CANVAS_SIZE / 2 - sledImg.height);
   ctx.closePath();
 }
 
