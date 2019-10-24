@@ -4,7 +4,8 @@ const ctx = canvas.getContext('2d');
 const CANVAS_SIZE = 200;
 const POINT_X = CANVAS_SIZE + 200;
 const ACTIVE_INDEX = 1;
-const SPEED = 0.01;
+const MAX_Y_OFFSET = 10;
+const SPEED = 0.03;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
@@ -12,12 +13,20 @@ canvas.height = CANVAS_SIZE;
 let points = [];
 let percentCounter = 0.5;
 
-const random = (max, min = 0) => Math.floor(Math.random() * (max - min)) + min;
+const random = (max = 1, min = 0) => Math.floor(Math.random() * (max - min)) + min;
+const last = arr => arr.length > 0 ? arr[arr.length - 1] : undefined;
 
-const generatePoint = (x, y) => ({
-  x: isNaN(x) ? POINT_X : x,
-  y: isNaN(y) ? random(CANVAS_SIZE) : y
-});
+const generatePoint = (pts, x, y) => {
+  const lastPoint = last(pts);
+  const lastY = lastPoint ? lastPoint.y : CANVAS_SIZE / 2;
+  const isBigDrop = Math.random() > 0.8;
+  const maxYOffset = isBigDrop ? 50 : MAX_Y_OFFSET;
+
+  return {
+    x: isNaN(x) ? POINT_X : x,
+    y: isNaN(y) ? random(lastY + maxYOffset, lastY - maxYOffset) : y
+  };
+};
 
 function CubicN (pct, a, b, c, d) {
   const t2 = pct * pct;
@@ -36,10 +45,10 @@ function getCubicBezierXYatPercent (start, end, cp1, cp2, percent) {
 
 function init () {
   points = [
-    generatePoint(-CANVAS_SIZE),
-    generatePoint(0),
-    generatePoint(CANVAS_SIZE),
-    generatePoint()
+    generatePoint(points, -CANVAS_SIZE),
+    generatePoint(points, 0),
+    generatePoint(points, CANVAS_SIZE),
+    generatePoint(points)
   ];
 
   loop();
@@ -55,7 +64,7 @@ function loop () {
 function update () {
   percentCounter += SPEED;
   if (percentCounter > 1) {
-    points = [ ...points.slice(1), generatePoint() ];
+    points = [ ...points.slice(1), generatePoint(points) ];
     percentCounter = SPEED;
   }
 
